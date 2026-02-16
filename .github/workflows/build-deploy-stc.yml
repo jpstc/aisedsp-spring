@@ -1,0 +1,25 @@
+
+name: Build & Deploy STC
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'stc-cdbp/**'
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build STC
+        run: mvn -q -f stc-cdbp/pom.xml -DskipTests package
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: Azure/setup-azd@v1
+      - name: Deploy STC
+        run: azd deploy --service stc-cdbp --no-prompt --environment prod

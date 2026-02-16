@@ -1,0 +1,25 @@
+
+name: Build & Deploy MZV
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'mzv-service/**'
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build MZV
+        run: mvn -q -f mzv-service/pom.xml -DskipTests package
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: Azure/setup-azd@v1
+      - name: Deploy MZV
+        run: azd deploy --service mzv-service --no-prompt --environment prod

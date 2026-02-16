@@ -1,0 +1,19 @@
+
+name: Deploy Infra
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infra/**'
+      - 'azure.yaml'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: Azure/setup-azd@v1
+      - name: Provision Infrastructure
+        run: azd provision --no-prompt --environment prod
