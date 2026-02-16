@@ -1,0 +1,12 @@
+
+<policies>
+  <inbound>
+    <base />
+    <validate-jwt header-name="Authorization" failed-validation-error-message="Invalid token">
+      <openid-config url="https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration" />
+      <required-claims>
+        <claim name="aud">api://your-api-id</claim>
+      </required-claims>
+    </validate-jwt>
+  </inbound>
+</policies>

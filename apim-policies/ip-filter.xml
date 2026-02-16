@@ -1,0 +1,11 @@
+
+<policies>
+  <inbound>
+    <base />
+    <check-header name="X-Forwarded-For" failed-check-error-message="IP not allowed">
+      <ip-filter action="allow">
+        <address>10.0.0.0/8</address>
+      </ip-filter>
+    </check-header>
+  </inbound>
+</policies>
