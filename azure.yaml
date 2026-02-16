@@ -1,0 +1,14 @@
+name: aisedsp-spring
+metadata:
+  template: aisedsp-spring@1.0.0
+infrastructure:
+  provider: bicep
+  path: ./infra/main.bicep
+hooks:
+  postprovision:
+    posix:
+      shell: sh
+      run: ./infra/scripts/postprovision.sh
+    windows:
+      shell: pwsh
+      run: ./infra/scripts/postprovision.ps1
