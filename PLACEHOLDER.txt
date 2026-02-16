@@ -1,1 +1,1 @@
-This is placeholder content for 02-mzv-service. Replace with full project files.
+This is placeholder content for 03-stc-cdbp. Replace with full project files.
