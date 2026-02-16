@@ -1,1 +1,1 @@
-This is placeholder content for 05-readme. Replace with full project files.
+This is placeholder content for 06-security. Replace with full project files.
