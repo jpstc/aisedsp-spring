@@ -4,7 +4,10 @@ resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: 'kv-aisedsp-${uniqueString(resourceGroup().id)}'
   location: location
   properties: {
-    sku: { family: 'A'; name: 'standard' }
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
     tenantId: tenant().tenantId
     enableRbacAuthorization: true
     enabledForTemplateDeployment: true

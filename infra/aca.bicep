@@ -9,7 +9,9 @@ resource kv 'Microsoft.KeyVault/vaults@2023-07-01' existing = { name: kvName }
 resource logws 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: 'log-aisedsp-${uniqueString(resourceGroup().id)}'
   location: location
-  sku: { name: 'PerGB2018' }
+  properties: {
+    sku: { name: 'PerGB2018' }
+  }
 }
 
 resource env 'Microsoft.App/managedEnvironments@2023-05-01' = {
@@ -37,8 +39,8 @@ resource mzv 'Microsoft.App/containerApps@2023-05-01' = {
     configuration: {
       ingress: { external: true, targetPort: 8080 }
       secrets: [
-        { name: 'sql-conn', value: '@Microsoft.KeyVault(SecretUri=' + sqlSecretUri + ')' }
-        { name: 'sb-conn',  value: '@Microsoft.KeyVault(SecretUri=' + sbSecretUri + ')' }
+        { name: 'sql-conn', value: '@Microsoft.KeyVault(SecretUri=${sqlSecretUri})' }
+        { name: 'sb-conn',  value: '@Microsoft.KeyVault(SecretUri=${sbSecretUri})' }
       ]
       registries: []
     }
@@ -66,8 +68,8 @@ resource stc 'Microsoft.App/containerApps@2023-05-01' = {
     configuration: {
       ingress: { external: true, targetPort: 8081 }
       secrets: [
-        { name: 'sql-conn', value: '@Microsoft.KeyVault(SecretUri=' + sqlSecretUri + ')' }
-        { name: 'sb-conn',  value: '@Microsoft.KeyVault(SecretUri=' + sbSecretUri + ')' }
+        { name: 'sql-conn', value: '@Microsoft.KeyVault(SecretUri=${sqlSecretUri})' }
+        { name: 'sb-conn',  value: '@Microsoft.KeyVault(SecretUri=${sbSecretUri})' }
       ]
     }
     template: {
