@@ -105,31 +105,35 @@ V resource group byste měli vidět následující prostředky (✅):
 1. V SQL Database jděte: **Query Editor** (Preview)
    - ⚠️ Pokud je databáze v "Paused" stavu, Query Editor ji automaticky obnoví
    - Počkejte 30-60 sekund, až se databáze obnoví
-2. Přihlaste se: `sqladmin` / `ChangeMe-12345!`
-3. Spusťte schema creation:
+2. Přihlaste se: `sqladmin` / `Securepass123!`
+3. Spusťte schema creation. **COPY EACH QUERY SEPARATELY** a spusťte je zvlášť:
 
+**Query 1 - Create Document table:**
 ```sql
--- Vytvoření tabulky Document
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Document')
 CREATE TABLE [dbo].[Document] (
-  [id] INT IDENTITY(1,1) PRIMARY KEY,
-  [title] NVARCHAR(MAX) NOT NULL,
-  [status] NVARCHAR(50) DEFAULT 'NEW',
-  [createdAt] DATETIME DEFAULT GETUTCDATE()
-);
-
--- Vytvoření tabulky StcEvent
-IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'StcEvent')
-CREATE TABLE [dbo].[StcEvent] (
-  [id] INT IDENTITY(1,1) PRIMARY KEY,
-  [documentId] INT,
-  [eventType] NVARCHAR(50),
-  [status] NVARCHAR(50),
-  [createdAt] DATETIME DEFAULT GETUTCDATE()
+    [id] INT IDENTITY(1,1) PRIMARY KEY,
+    [title] NVARCHAR(MAX) NOT NULL,
+    [status] NVARCHAR(50) DEFAULT 'NEW',
+    [createdAt] DATETIME DEFAULT GETUTCDATE()
 );
 ```
 
-4. Klikněte **Run** - měla by skončit bez chyby
+**Query 2 - Create StcEvent table:**
+```sql
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'StcEvent')
+CREATE TABLE [dbo].[StcEvent] (
+    [id] INT IDENTITY(1,1) PRIMARY KEY,
+    [documentId] INT,
+    [eventType] NVARCHAR(50),
+    [status] NVARCHAR(50),
+    [createdAt] DATETIME DEFAULT GETUTCDATE()
+);
+```
+
+4. Klikněte **Run** na każdý query - měly by skončit bez chyby
+
+⚠️ **DŮLEŽITÉ**: Pokud dostanete chybu `Incorrect syntax near '` ` - Zkopírujte obsah query přímo bez markdown backticks
 
 ---
 
@@ -182,11 +186,48 @@ CREATE TABLE [dbo].[StcEvent] (
 ### STC Service
 
 1. V resource group najděte **stc-cdbp** (Container App)
-2. Zkontrolujte stejně jako MZV (viz výše)
-3. **Environment variables** by měly mít navíc:
-   - `SB_SUB`: `stc-cdbp` (subscription name)
+2. Zkontrolujte hlavní stránku:
+   - **Status**: ✅ Running (pokud je šedé/deleting, počkejte)
+   - **Application URL**: `https://stc-cdbp.......azurecontainerapps.io` (zkopírujte)
 
-4. Nastavte stejným způsobem jako MZV
+3. V levém menu **Containers**:
+   - ✅ Image: `mcr.microsoft.com/azuredocs/containerapps-helloworld:latest` (nebo vaše image)
+   - ✅ CPU: `0.5`
+   - ✅ Memory: `1Gi`
+
+4. **DŮLEŽITÉ**: Nastavení environment variables
+   - Klikněte na **Container** v editoru
+   - Pod **Environment variables** by měly být:
+     - `SQL_CONN`: Měla by být vaše SQL connection string
+     - `SB_CONN`: Měla by být vaše Service Bus connection string
+     - `SB_SUB`: `stc-cdbp` (subscription name - **DŮLEŽITÉ pro STC**)
+     - `SB_TOPIC`: `doc-status` (topic pro příjem zpráv)
+
+   **Pokud chybí nebo jsou na "TO_BE_SET_IN_PORTAL"**:
+   
+   a) Klikněte **Edit and deploy** > **Edit container**
+   
+   b) Pod **Environment variables** klikněte **+ Add** pro každou:
+   
+   | Variable | Hodnota |
+   |----------|---------|
+   | `SQL_CONN` | Zkopírujte z Key Vault > `sql-connection-string` |
+   | `SB_CONN` | Zkopírujte z Key Vault > `servicebus-connection-string` |
+   | `SB_SUB` | `stc-cdbp` |
+   | `SB_TOPIC` | `doc-status` |
+   
+   c) Klikněte **Save** > **Deploy**
+
+5. **Pokud je Status "Activation failed"**:
+   - Jděte na **Monitoring** > **Logs** a spusťte:
+   ```kusto
+   ContainerAppConsoleLogs
+   | where ContainerAppName == "stc-cdbp"
+   | order by TimeGenerated desc
+   | take 50
+   ```
+   - Hledejte ERROR nebo EXCEPTION zprávy
+   - Pokud problém přetrvává, klikněte **Restart**
 
 ---
 
@@ -488,6 +529,33 @@ requests
 1. Ověřte, že MZV aplikace posílá zprávy
 2. V Service Bus > **Subscriptions** > **Filters** zkontrolujte kork
 3. Pokud nejsou filtery, měl by odebírat všechny zprávy
+
+### Chyba: Container App "Activation failed"
+
+**Příčiny**:
+1. Environment variables nejsou správně nastaveny
+2. Connection stringy jsou neplatné nebo chybí
+3. Aplikace se nebootuje kvůli chybě v konfiguraci
+
+**Řešení**:
+1. Jděte na Container App > **Monitoring** > **Logs**
+2. Spusťte query pro zobrazení chyb:
+   ```kusto
+   ContainerAppConsoleLogs
+   | where ContainerAppName == "mzv-service" or ContainerAppName == "stc-cdbp"
+   | where Log contains "ERROR" or Log contains "EXCEPTION"
+   | order by TimeGenerated desc
+   | take 50
+   ```
+3. Zkontrolujte výstup - měl by ukazovat konkrétní chybu
+4. **Nejčastější problémy**:
+   - ❌ `Connection string is invalid` → Zkontrolujte `SQL_CONN` a `SB_CONN` v Key Vault
+   - ❌ `Cannot connect to database` → Zkontrolujte firewall na SQL Server
+   - ❌ `Spring Boot startup failed` → Zkontrolujte environment variables (`SPRING_*`)
+5. **Řešení**:
+   - Opravte environment variables
+   - Klikněte **Restart** na Container App
+   - Počkejte 2-3 minuty a zkontrolujte logy znovu
 
 ---
 

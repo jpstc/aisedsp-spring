@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700">
+  <style>
+    .bg { fill: #f3f6f9 }
+    .sidebar { fill: #0f1720 }
+    .menu-item { fill: #e6eef6; font: 14px 'Segoe UI', Arial; }
+    .menu-text { fill: #94a3b8; font: 14px 'Segoe UI', Arial; }
+    .highlight { fill: #2563eb; }
+    .panel { fill: #ffffff; stroke: #e6eef6; stroke-width: 1 }
+    .title { fill: #0b1724; font: 20px 'Segoe UI Semibold', Arial; }
+    .label { fill: #334155; font: 14px 'Segoe UI', Arial; }
+    .toggle { fill: #10b981; }
+    .button { fill: #2563eb; }
+    .btn-text { fill: #ffffff; font: 13px 'Segoe UI', Arial; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1200" height="700" rx="0"/>
+
+  <!-- Sidebar -->
+  <rect class="sidebar" x="20" y="20" width="260" height="660" rx="8" />
+  <text x="40" y="60" class="menu-item">Azure Portal</text>
+
+  <!-- Sidebar items -->
+  <g transform="translate(40,90)">
+    <text y="0" class="menu-text">Overview</text>
+    <text y="36" class="menu-text">Activity log</text>
+    <text y="72" class="menu-text">Properties</text>
+    <rect x="-6" y="96" width="200" height="32" rx="4" class="highlight" opacity="0.12" />
+    <text y="120" class="menu-text" fill="#0f1720">Firewalls and virtual networks</text>
+    <text y="156" class="menu-text">Networking</text>
+    <text y="192" class="menu-text">Connection strings</text>
+  </g>
+
+  <!-- Main panel -->
+  <rect class="panel" x="300" y="40" width="880" height="620" rx="8" />
+  <text x="320" y="76" class="title">sql-aisedsp-XXXX (SQL Server)</text>
+
+  <!-- Section header -->
+  <text x="320" y="120" class="label">Firewalls and virtual networks</text>
+
+  <!-- Content box -->
+  <rect x="320" y="140" width="540" height="220" rx="6" fill="#fbfdff" stroke="#e6eef6" />
+  <text x="340" y="175" class="label">Allow Azure services and resources to access this server</text>
+  <!-- Toggle ON -->
+  <g transform="translate(780,150)">
+    <rect x="0" y="0" width="64" height="34" rx="20" fill="#d1fae5" />
+    <circle cx="48" cy="17" r="13" fill="#10b981" />
+  </g>
+
+  <text x="340" y="215" class="label">Client IP addresses</text>
+  <rect x="340" y="225" width="420" height="40" rx="6" fill="#ffffff" stroke="#e6eef6" />
+  <text x="350" y="252" class="menu-text">Your client IP: 203.0.113.45</text>
+  <rect x="780" y="225" width="160" height="40" rx="6" class="button" />
+  <text x="810" y="252" class="btn-text">Add client IP</text>
+
+  <!-- Helpful note -->
+  <text x="320" y="380" class="menu-text">Tip: If connection fails, enable "Allow Azure services" and add your IP.</text>
+
+  <!-- Right-side panel showing rules list -->
+  <rect x="320" y="420" width="540" height="180" rx="6" fill="#ffffff" stroke="#e6eef6" />
+  <text x="340" y="450" class="label">Firewall rules</text>
+  <text x="340" y="480" class="menu-text">- AllowAllAzureInternal (0.0.0.0 - 255.255.255.255) — System</text>
+  <text x="340" y="510" class="menu-text">- OfficeHome (203.0.113.45 - 203.0.113.45) — User</text>
+
+  <!-- Footer note box -->
+  <rect x="860" y="420" width="300" height="180" rx="6" fill="#f8fafc" stroke="#e6eef6" />
+  <text x="880" y="450" class="label">Důležité</text>
+  <text x="880" y="480" class="menu-text">- Pokud používáte App Service/Container Apps, povolte přístup z Azure.</text>
+  <text x="880" y="505" class="menu-text">- Pro lokální přístup přidejte vaši veřejnou IP.</text>
+
+  <!-- Small highlight marker on sidebar item -->
+  <rect x="36" y="206" width="8" height="32" rx="2" fill="#2563eb" />
+
+</svg>
